@@ -64,4 +64,15 @@ public class OrderRecordEntity {
                 ", updateTime=" + updateTime +
                 '}';
     }
+
+    public OrderRecordEntity(Integer id, String orderNo, String orderType, Date createTime, Date updateTime) {
+        this.id = id;
+        this.orderNo = orderNo;
+        this.orderType = orderType;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
+
+    public OrderRecordEntity() {
+    }
 }
