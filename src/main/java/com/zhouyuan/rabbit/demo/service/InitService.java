@@ -2,20 +2,22 @@ package com.zhouyuan.rabbit.demo.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CountDownLatch;
 
+@Service
 public class InitService {
 
     private static int MOBILE = 0;
-    private static final int MAX_THREAD_NUM = 500000;
+    private static final int MAX_THREAD_NUM = 100;
     private static final Logger log = LoggerFactory.getLogger(InitService.class);
 
     public void generateMultiThread(){
 
         log.info("开始初始化线程数：----> ");
 
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(100);
         for (int i = 0; i < MAX_THREAD_NUM; i++) {
             new Thread(new ThreadService(countDownLatch)).start();
         }
@@ -34,10 +36,11 @@ public class InitService {
         public void run() {
             try {
                 latch.await();
-                MOBILE += 1;
             } catch (InterruptedException e) {
-                log.error("线程运行中出现异常：",e);
+                e.printStackTrace();
             }
+            MOBILE += 1;
+            log.info("打印手机号：{}",MOBILE);
         }
     }
 }
