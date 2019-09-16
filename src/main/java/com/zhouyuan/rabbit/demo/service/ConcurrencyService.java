@@ -30,24 +30,31 @@ public class ConcurrencyService {
      * @param mobile
      */
     public void manageRobbing(String mobile){
-        try {
+/*        try {
             Product product=productMapper.selectByProductNo(ProductNo);
             if (product!=null && product.getTotal()>0){
                 log.info("当前手机号：{} 恭喜您抢到单了!",mobile);
-                productMapper.updateTotal(product);
+                int result = productMapper.updateTotal(product);
+                if (result>0) {
+                    ProductRobbingRecord entity=new ProductRobbingRecord();
+                    entity.setMobile(mobile);
+                    entity.setProductId(product.getId());
+                    productRobbingRecordMapper.insertSelective(entity);
+                }
             }else{
                 log.error("当前手机号：{} 抢不到单!",mobile);
 
             }
         }catch (Exception e){
             log.error("处理抢单发生异常：mobile={} ",mobile);
-        } //--v1.0
+        } //--v1.0*/
 
 
         //+v2.0
-/*        try {
+        try {
             Product product=productMapper.selectByProductNo(ProductNo);
             if (product!=null && product.getTotal()>0){
+                //这个result是什么？
                 int result=productMapper.updateTotal(product);
                 if (result>0) {
                     ProductRobbingRecord entity=new ProductRobbingRecord();
@@ -58,7 +65,7 @@ public class ConcurrencyService {
             }
         }catch (Exception e){
             log.error("处理抢单发生异常：mobile={} ",mobile);
-        }*/
+        }
     }
 
 

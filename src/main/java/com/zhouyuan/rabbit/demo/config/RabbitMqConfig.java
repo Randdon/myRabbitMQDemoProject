@@ -96,17 +96,40 @@ public class RabbitMqConfig {
 
     @Bean
     public DirectExchange basicExchange(){
-        return new DirectExchange(environment.getProperty("rabbitmq.simple.message.exchange.name"),true,false);
+        return new DirectExchange(environment.getProperty("rabbitmq.simple.message.exchange.name"),
+                true,false);
     }
 
     @Bean
     public Queue basicQueue(){
-        return new Queue(environment.getProperty("rabbitmq.simple.message.queue.name"),true);
+        return new Queue(environment.getProperty("rabbitmq.simple.message.queue.name"),
+                true);
     }
 
     @Bean
     public Binding basicBinding(){
         return BindingBuilder.bind(basicQueue()).to(basicExchange())
                 .with(environment.getProperty("rabbitmq.simple.message.routingKey.name"));
+    }
+
+    /**
+     * 构建抢单消息模型
+     */
+    @Bean
+    public DirectExchange robExchange(){
+        return new DirectExchange(environment.getProperty("rabbitmq.rob.product.exchange.name"),
+                true,true);
+    }
+
+    @Bean
+    public Queue robQueue(){
+        return new Queue(environment.getProperty("rabbitmq.rob.product.queue.name"),true);
+    }
+
+    @Bean
+    public Binding robBind(){
+        return BindingBuilder.bind(robQueue()).to(robExchange()).with(
+                environment.getProperty("rabbitmq.rob.product.routingKey.name")
+        );
     }
 }

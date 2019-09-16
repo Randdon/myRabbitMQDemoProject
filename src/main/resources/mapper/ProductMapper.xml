@@ -93,11 +93,11 @@
 
   <!--更新库存量-->
   <update id="updateTotal">
-<!--    UPDATE product a
+    <!--UPDATE product a
     SET a.total = a.total - 1
-    WHERE a.product_no = #{productNo}
-    v1.0
--->
+    WHERE a.product_no = #{productNo}-->
+    <!--v1.0-->
+
     <!--v2.0，据博主说加上这个条件后类似于MySQL的乐观锁-->
     UPDATE product a
     SET a.total = a.total - 1
@@ -119,25 +119,3 @@
   </select>
 
 </mapper>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

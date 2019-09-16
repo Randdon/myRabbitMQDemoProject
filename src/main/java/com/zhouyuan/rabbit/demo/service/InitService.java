@@ -11,10 +11,12 @@ import java.util.concurrent.CountDownLatch;
 public class InitService {
 
     private static Integer MOBILE = 0;
-    private static final int MAX_THREAD_NUM = 500;
+    private static final int MAX_THREAD_NUM = 50000;
     private static final Logger log = LoggerFactory.getLogger(InitService.class);
     @Autowired
     ConcurrencyService concurrencyService;
+    @Autowired
+    CommonMqService commonMqService;
     public void generateMultiThread(){
 
         log.info("开始初始化线程数：----> ");
@@ -39,7 +41,8 @@ public class InitService {
             try {
                 latch.await();
                 MOBILE += 1;
-                concurrencyService.manageRobbing(String.valueOf(MOBILE));
+                commonMqService.sendRobMessage(String.valueOf(MOBILE));//v2.0
+                //concurrencyService.manageRobbing(String.valueOf(MOBILE));//v1.0
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
