@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zhouyuan.rabbit.demo.mapper.OrderRecordMapper">
     <resultMap id="BaseResultMap" type="com.zhouyuan.rabbit.demo.entity.OrderRecordEntity">
-        <id column="id" jdbcType="INTEGER" property="id" />
-        <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
-        <result column="order_type" jdbcType="VARCHAR" property="orderType" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="order_type" jdbcType="VARCHAR" property="orderType"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, order_no, order_type, create_time, update_time
+        id, order_no, order_type, create_time, update_time
     </sql>
     <insert id="insertSelective" parameterType="com.zhouyuan.rabbit.demo.entity.OrderRecordEntity">
         insert into order_record
@@ -50,7 +50,8 @@
     </insert>
     <!--查询所有数据-->
     <select id="selectAll" resultType="com.zhouyuan.rabbit.demo.entity.OrderRecordEntity">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM order_record
     </select>
 

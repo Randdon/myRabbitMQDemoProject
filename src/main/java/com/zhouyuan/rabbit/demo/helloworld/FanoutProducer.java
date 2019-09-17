@@ -24,7 +24,7 @@ public class FanoutProducer {
             Channel channel = connection.createChannel();
             channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
             String message = "This is a Fanout Broadcast message!";
-            channel.basicPublish(EXCHANGE_NAME,"",null,message.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes());
 
             System.out.println("Producer broadcasted a message: [" + message + "]");
             channel.close();

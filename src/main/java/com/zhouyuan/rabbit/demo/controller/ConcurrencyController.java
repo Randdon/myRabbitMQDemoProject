@@ -12,7 +12,7 @@ public class ConcurrencyController {
     InitService initService;
 
     @RequestMapping(value = "rob")
-    public String concurrencyRequest(){
+    public String concurrencyRequest() {
         initService.generateMultiThread();
         return "success";
     }

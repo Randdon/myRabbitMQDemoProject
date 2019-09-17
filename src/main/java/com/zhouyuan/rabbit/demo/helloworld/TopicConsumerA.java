@@ -18,20 +18,20 @@ public class TopicConsumerA {
             Channel channel = connection.createChannel();
 
             channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.TOPIC);
-            channel.queueDeclare(QUEUE_NAME,true,false,false,null);
-            channel.queueBind(QUEUE_NAME,EXCHANGE_NAME,ROUTINGKEY,null);
+            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTINGKEY, null);
 
-            Consumer consumer = new DefaultConsumer(channel){
+            Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    String message = new String(body,"UTF-8");
+                    String message = new String(body, "UTF-8");
                     System.out.println("This is TopicConsumerA with 'zhouyuan.revolution.*' routingkey" +
                             "\r\n" +
                             "Here are received messages:[" + message + "]");
                 }
             };
 
-            channel.basicConsume(QUEUE_NAME,true,consumer);
+            channel.basicConsume(QUEUE_NAME, true, consumer);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (TimeoutException e) {

@@ -19,17 +19,17 @@ public class FanoutConsumerB {
         try {
             Connection connection = connectionFactory.newConnection();
             Channel channel = connection.createChannel();
-            channel.exchangeDeclare(EXCHANGE_NAME,BuiltinExchangeType.FANOUT);
-            channel.queueDeclare(QUEUE_NAME,false,false,false,null);
-            channel.queueBind(QUEUE_NAME,EXCHANGE_NAME,"");
-            Consumer consumer = new DefaultConsumer(channel){
+            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
+            Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    String message = new String(body,"UTF-8");
+                    String message = new String(body, "UTF-8");
                     System.out.println("I`m Consumer B, I received the broadcast: [" + message + "]");
                 }
             };
-            channel.basicConsume(QUEUE_NAME,true,consumer);
+            channel.basicConsume(QUEUE_NAME, true, consumer);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (TimeoutException e) {

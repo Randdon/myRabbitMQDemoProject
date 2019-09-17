@@ -22,9 +22,9 @@ public class TopicProducer {
             String message2 = "This a Topic Exchange Message!,my routingkey is zhouyuan.revolution.translation.irn";
             String message3 = "This a Topic Exchange Message!,my routingkey is zhouyuan.revolution";
 
-            channel.basicPublish(EXCHANGE_NAME,"zhouyuan.revolution.translation",null,message1.getBytes());
-            channel.basicPublish(EXCHANGE_NAME,"zhouyuan.revolution.translation.irn",null,message2.getBytes());
-            channel.basicPublish(EXCHANGE_NAME,"zhouyuan.revolution",null,message3.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, "zhouyuan.revolution.translation", null, message1.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, "zhouyuan.revolution.translation.irn", null, message2.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, "zhouyuan.revolution", null, message3.getBytes());
 
             System.out.println("Topic Producer finished sending message!");
             channel.close();

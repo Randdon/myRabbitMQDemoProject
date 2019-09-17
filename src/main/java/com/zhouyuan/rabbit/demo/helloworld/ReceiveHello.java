@@ -17,7 +17,7 @@ public class ReceiveHello {
             Connection connection = connectionFactory.newConnection();
             Channel channel = connection.createChannel();
             //第一个Boolean型的参数的意义是是否持久化
-            channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             System.out.println("ZhouYuan is waiting for messages. To exit press CTRL+C");
 
 /*
@@ -30,12 +30,12 @@ public class ReceiveHello {
 */
 
             //视频教学的写法：
-            Consumer consumer = new DefaultConsumer(channel){
+            Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
                         throws IOException {
-                    String message = new String(body,"UTF-8");
-                    System.out.println("ZhouYuan received the message from RabbitMQ:'" + message + "'" );
+                    String message = new String(body, "UTF-8");
+                    System.out.println("ZhouYuan received the message from RabbitMQ:'" + message + "'");
                 }
             };
             /**
@@ -50,7 +50,7 @@ public class ReceiveHello {
              * 	这时再去控制台界面查看unacked参数又会变成0，因为被确认消费了
              * 	再重启一次ReceiveHello程序可以看到不会再接收到该条消息了，因为已经被确认消费了
              */
-            channel.basicConsume(QUEUE_NAME,true,consumer);
+            channel.basicConsume(QUEUE_NAME, true, consumer);
 
         } catch (IOException e) {
             e.printStackTrace();

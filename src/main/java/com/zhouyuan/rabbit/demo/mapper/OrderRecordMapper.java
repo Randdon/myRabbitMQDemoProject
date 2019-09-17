@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface OrderRecordMapper {
     void insertSelective(OrderRecordEntity entity);
+
     List<OrderRecordEntity> selectAll();
 }

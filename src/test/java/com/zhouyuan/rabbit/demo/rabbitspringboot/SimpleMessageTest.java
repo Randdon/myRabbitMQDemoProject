@@ -37,7 +37,7 @@ public class SimpleMessageTest extends DemoApplicationTests {
      * 在com.zhouyuan.rabbit.demo.config.RabbitMqConfig里配置basicExchange\basicQueue\basicBinding这三个
      * 基本消息模型，就可以跑通本测试方法，在RabbitMQ控制后台看到队列和交换机以及发送的消息
      */
-    public void sendSimpleMessage(){
+    public void sendSimpleMessage() {
         rabbitTemplate.setExchange(environment.getProperty("rabbitmq.simple.message.exchange.name"));
         rabbitTemplate.setRoutingKey(environment.getProperty("rabbitmq.simple.message.routingKey.name"));
         String content = "This is first Spring boot with RabbitMQ test!";
@@ -53,11 +53,11 @@ public class SimpleMessageTest extends DemoApplicationTests {
     /**
      * 发送对象消息
      */
-    public void sendObjectMessage(){
+    public void sendObjectMessage() {
         rabbitTemplate.setExchange(environment.getProperty("rabbitmq.simple.message.exchange.name"));
         rabbitTemplate.setRoutingKey(environment.getProperty("rabbitmq.simple.message.routingKey.name"));
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
-        OrderRecordEntity orderRecordEntity = new OrderRecordEntity(1,"2","cat",new Date(),new Date());
+        OrderRecordEntity orderRecordEntity = new OrderRecordEntity(1, "2", "cat", new Date(), new Date());
         try {
             Message message = MessageBuilder.withBody(objectMapper.writeValueAsBytes(orderRecordEntity))
                     .setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
@@ -72,12 +72,12 @@ public class SimpleMessageTest extends DemoApplicationTests {
      * ${rabbitmq.simple.message.queue.name}取自application.properties:43，
      * singleListenerContainer取自com/zhouyuan/rabbit/demo/config/RabbitMqConfig.java:36
      */
-    @RabbitListener(queues = "${rabbitmq.simple.message.queue.name}",containerFactory = "singleListenerContainer")
-    public void rabbitListener(@Payload byte[] message){
+    @RabbitListener(queues = "${rabbitmq.simple.message.queue.name}", containerFactory = "singleListenerContainer")
+    public void rabbitListener(@Payload byte[] message) {
         try {
             //接收字符串
             //String result = new String(message,"UTF-8");
-            OrderRecordEntity result = objectMapper.readValue(message,OrderRecordEntity.class);
+            OrderRecordEntity result = objectMapper.readValue(message, OrderRecordEntity.class);
             System.out.println("接收到的消息为：【" + result + "】");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

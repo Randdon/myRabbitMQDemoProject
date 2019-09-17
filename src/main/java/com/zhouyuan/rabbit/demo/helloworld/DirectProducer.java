@@ -26,9 +26,9 @@ public class DirectProducer {
             String message1 = "This is routing01`s message!";
             String message2 = "This is routing02`s message!";
             String message3 = "This is routing03`s message!";
-            channel.basicPublish(EXCHANGE_NAME,ROUTINGKEY_01,null,message1.getBytes());
-            channel.basicPublish(EXCHANGE_NAME,ROUTINGKEY_02,null,message2.getBytes());
-            channel.basicPublish(EXCHANGE_NAME,ROUTINGKEY_03,null,message3.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, ROUTINGKEY_01, null, message1.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, ROUTINGKEY_02, null, message2.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, ROUTINGKEY_03, null, message3.getBytes());
             System.out.println("DirectProducer finished publishing three messages.");
             channel.close();
             connection.close();

@@ -16,12 +16,13 @@ import org.springframework.stereotype.Component;
 public class OrderRecordListener implements ApplicationListener<OrderRecordEvent> {
     @Autowired
     OrderRecordMapper orderRecordMapper;
+
     @Override
     public void onApplicationEvent(OrderRecordEvent orderRecordEvent) {
 
         OrderRecordEntity entity = new OrderRecordEntity();
 
-        BeanUtils.copyProperties(orderRecordEvent,entity);
+        BeanUtils.copyProperties(orderRecordEvent, entity);
 
         orderRecordMapper.insertSelective(entity);
     }
