@@ -7,6 +7,8 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.support.DefaultMessagePropertiesConverter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
@@ -54,7 +56,10 @@ public class RabbitMqConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factoryConfigurer.configure(factory,connectionFactory);//为什么不用factory.setConnectionFactory(connectionFactory);？
         factory.setMessageConverter(new Jackson2JsonMessageConverter());
-        factory.setAcknowledgeMode(AcknowledgeMode.NONE);//单一消费者没有设置这项？？
+
+        //这里是为这个容器工厂确定消息确认机制，这里的设置会覆盖掉application.properties里的配置
+        factory.setAcknowledgeMode(AcknowledgeMode.NONE);
+
         factory.setConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.concurrency",int.class));
         factory.setMaxConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.max-concurrency",int.class));
         factory.setPrefetchCount(environment.getProperty("spring.rabbitmq.listener.simple.prefetch",int.class));
@@ -131,5 +136,31 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(robQueue()).to(robExchange()).with(
                 environment.getProperty("rabbitmq.rob.product.routingKey.name")
         );
+    }
+
+    /**
+     * 并发配置-消息确认机制
+     * @return
+     */
+    @Bean(name = "simpleContainer")
+    public SimpleMessageListenerContainer simpleContainer(){
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+
+        container.setConnectionFactory(connectionFactory);
+        //视频中用的是container.setMessageConverter(new Jackson2JsonMessageConverter());但这个方法已不被推荐使用了
+        container.setMessagePropertiesConverter(new DefaultMessagePropertiesConverter());
+
+        /**
+         * 并发配置
+         */
+        container.setConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.concurrency",Integer.class));
+        container.setMaxConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.max-concurrency",Integer.class));
+        container.setPrefetchCount(environment.getProperty("spring.rabbitmq.listener.simple.prefetch",Integer.class));
+
+        /**
+         * 消息确认机制配置
+         */
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        return container;
     }
 }
