@@ -52,4 +52,23 @@ public class Product {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", productNo='" + productNo + '\'' +
+                ", total=" + total +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
+
+    public Product(Integer id, String productNo, Integer total) {
+        this.id = id;
+        this.productNo = productNo;
+        this.total = total;
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
 }

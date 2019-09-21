@@ -1,5 +1,6 @@
 package com.zhouyuan.rabbit.demo.config;
 
+import com.zhouyuan.rabbit.demo.rabbitlistener.SimpleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -11,6 +12,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.support.DefaultMessagePropertiesConverter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -138,12 +140,32 @@ public class RabbitMqConfig {
         );
     }
 
+    @Bean
+    public Queue simpleQueue(){
+        return new Queue(environment.getProperty("rabbitmq.simple.container.queue.name"),true);
+    }
+
+    @Bean
+    public TopicExchange simpleExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.simple.container.exchange.name"),
+                true,false);
+    }
+
+    @Bean
+    public Binding simpleBingding(){
+        return BindingBuilder.bind(simpleQueue())
+                .to(simpleExchange())
+                .with(environment.getProperty("rabbitmq.simple.container.routingKey.name"));
+    }
+
+    @Autowired
+    SimpleListener simpleListener;
     /**
-     * 并发配置-消息确认机制
+     * 并发配置-消息确认机制-Listener
      * @return
      */
     @Bean(name = "simpleContainer")
-    public SimpleMessageListenerContainer simpleContainer(){
+    public SimpleMessageListenerContainer simpleContainer(@Qualifier("simpleQueue") Queue simpleQueue){
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
 
         container.setConnectionFactory(connectionFactory);
@@ -161,6 +183,8 @@ public class RabbitMqConfig {
          * 消息确认机制配置
          */
         container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        container.setQueues(simpleQueue);
+        container.setMessageListener(simpleListener);
         return container;
     }
 }
