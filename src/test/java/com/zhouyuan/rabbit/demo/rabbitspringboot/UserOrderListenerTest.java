@@ -57,6 +57,8 @@ public class UserOrderListenerTest extends DemoApplicationTests {
 
         /**
          * 系统级别-日志记录-异步分出去
+         * 这样的好处在于，如果日志记录的地方特别耗时的时候，异步放到rabbitmq去执行不会影响、阻塞主线程的业务处理逻辑，
+         * 如果同步地放在主线程去处理则很可能会影响、阻塞后面的业务处理
          */
         LogDto logDto = new LogDto("userOrderListenerTest",dto.toString());
 

@@ -227,7 +227,7 @@ public class RabbitMqConfig {
     }
 
     /**
-     * 日志消息模型
+     * 系统日志消息模型
      */
 
     @Bean
@@ -245,5 +245,26 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(logSystemQueue())
                 .to(logSystemExchange())
                 .with(environment.getProperty("rabbitmq.log.system.routingKey.name"));
+    }
+
+    /**
+     * 用户操作日志消息模型
+     */
+
+    @Bean
+    public DirectExchange logUserExchange(){
+        return new DirectExchange(environment.getProperty("rabbitmq.log.user.exchange.name"));
+    }
+
+    @Bean
+    public Queue logUserQueue(){
+        return new Queue(environment.getProperty("rabbitmq.log.user.queue.name"));
+    }
+
+    @Bean
+    public Binding logUserBinding(){
+        return BindingBuilder.bind(logUserQueue())
+                .to(logUserExchange())
+                .with(environment.getProperty("rabbitmq.log.user.routingKey.name"));
     }
 }
