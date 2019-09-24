@@ -225,4 +225,25 @@ public class RabbitMqConfig {
 
         return container;
     }
+
+    /**
+     * 日志消息模型
+     */
+
+    @Bean
+    public TopicExchange logSystemExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.log.system.exchange.name"));
+    }
+
+    @Bean
+    public Queue logSystemQueue(){
+        return new Queue(environment.getProperty("rabbitmq.log.system.queue.name"));
+    }
+
+    @Bean
+    public Binding logSystemBinding(){
+        return BindingBuilder.bind(logSystemQueue())
+                .to(logSystemExchange())
+                .with(environment.getProperty("rabbitmq.log.system.routingKey.name"));
+    }
 }

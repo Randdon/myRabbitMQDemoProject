@@ -1,4 +1,4 @@
-package com.debug.steadyjack.dto;
+package com.zhouyuan.rabbit.demo.dto;
 
 import java.io.Serializable;
 
