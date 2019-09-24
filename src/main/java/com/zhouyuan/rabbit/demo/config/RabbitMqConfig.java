@@ -1,6 +1,7 @@
 package com.zhouyuan.rabbit.demo.config;
 
 import com.zhouyuan.rabbit.demo.rabbitlistener.SimpleListener;
+import com.zhouyuan.rabbit.demo.rabbitlistener.UserOrderListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -185,6 +186,43 @@ public class RabbitMqConfig {
         container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setQueues(simpleQueue);
         container.setMessageListener(simpleListener);
+        return container;
+    }
+
+    /**
+     * 用户商城下单实战
+     */
+
+    @Bean
+    public TopicExchange userOrderExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.user.order.exchange.name"));
+    }
+
+    @Bean
+    public Queue userOrderQueue(){
+        return new Queue(environment.getProperty("rabbitmq.user.order.queue.name"));
+    }
+
+    @Bean
+    public Binding userOrderBinding(){
+        return BindingBuilder.bind(userOrderQueue())
+                .to(userOrderExchange())
+                .with(environment.getProperty("rabbitmq.user.order.routingKey.name"));
+    }
+
+    @Autowired
+    UserOrderListener userOrderListener;
+
+    @Bean
+    public SimpleMessageListenerContainer userOrderContainer(@Qualifier("userOrderQueue") Queue userOrderQueue){
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setMessagePropertiesConverter(new DefaultMessagePropertiesConverter());
+
+        container.setQueues(userOrderQueue);
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        container.setMessageListener(userOrderListener);
+
         return container;
     }
 }
