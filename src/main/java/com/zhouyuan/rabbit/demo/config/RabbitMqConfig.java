@@ -19,6 +19,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Configuration
 public class RabbitMqConfig {
@@ -287,5 +290,32 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(mailQueue())
                 .to(mailExchange())
                 .with(environment.getProperty("rabbitmq.mail.routingKey.name"));
+    }
+
+
+    /**
+     * 死信队列消息模型
+     */
+
+    @Bean
+    public Queue deadLetterQueue(){
+        Map<String,Object> args = new HashMap<>(3);
+        args.put("x-dead-letter-exchange",environment.getProperty("rabbitmq.dead.letter.exchange.name"));
+        args.put("x-dead-letter-routing-key",environment.getProperty("rabbitmq.dead.letter.routingKey.name"));
+        args.put("x-message-ttl",5000);
+
+        return new Queue(environment.getProperty("rabbitmq.dead.letter.queue.name"),true,false,false,args);
+    }
+
+    @Bean
+    public TopicExchange deadLetterExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.dead.letter.source.exchange.name"),true,false);
+    }
+
+    @Bean
+    public Binding deadLetterBinding(){
+        return BindingBuilder.bind(deadLetterQueue())
+                .to(deadLetterExchange())
+                .with(environment.getProperty("rabbitmq.dead.letter.source.routingKey.name"));
     }
 }
