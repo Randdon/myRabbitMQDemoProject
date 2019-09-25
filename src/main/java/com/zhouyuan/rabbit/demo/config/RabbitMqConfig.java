@@ -126,7 +126,7 @@ public class RabbitMqConfig {
     @Bean
     public DirectExchange robExchange(){
         return new DirectExchange(environment.getProperty("rabbitmq.rob.product.exchange.name"),
-                true,true);
+                true,false);
     }
 
     @Bean
@@ -195,12 +195,12 @@ public class RabbitMqConfig {
 
     @Bean
     public TopicExchange userOrderExchange(){
-        return new TopicExchange(environment.getProperty("rabbitmq.user.order.exchange.name"));
+        return new TopicExchange(environment.getProperty("rabbitmq.user.order.exchange.name"),true,false);
     }
 
     @Bean
     public Queue userOrderQueue(){
-        return new Queue(environment.getProperty("rabbitmq.user.order.queue.name"));
+        return new Queue(environment.getProperty("rabbitmq.user.order.queue.name"),true);
     }
 
     @Bean
@@ -232,12 +232,12 @@ public class RabbitMqConfig {
 
     @Bean
     public TopicExchange logSystemExchange(){
-        return new TopicExchange(environment.getProperty("rabbitmq.log.system.exchange.name"));
+        return new TopicExchange(environment.getProperty("rabbitmq.log.system.exchange.name"),true,false);
     }
 
     @Bean
     public Queue logSystemQueue(){
-        return new Queue(environment.getProperty("rabbitmq.log.system.queue.name"));
+        return new Queue(environment.getProperty("rabbitmq.log.system.queue.name"),true);
     }
 
     @Bean
@@ -253,12 +253,12 @@ public class RabbitMqConfig {
 
     @Bean
     public DirectExchange logUserExchange(){
-        return new DirectExchange(environment.getProperty("rabbitmq.log.user.exchange.name"));
+        return new DirectExchange(environment.getProperty("rabbitmq.log.user.exchange.name"),true,false);
     }
 
     @Bean
     public Queue logUserQueue(){
-        return new Queue(environment.getProperty("rabbitmq.log.user.queue.name"));
+        return new Queue(environment.getProperty("rabbitmq.log.user.queue.name"),true);
     }
 
     @Bean
@@ -266,5 +266,26 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(logUserQueue())
                 .to(logUserExchange())
                 .with(environment.getProperty("rabbitmq.log.user.routingKey.name"));
+    }
+
+    /**
+     * 邮件发送消息模型
+     */
+
+    @Bean
+    public DirectExchange mailExchange(){
+        return new DirectExchange(environment.getProperty("rabbitmq.mail.exchange.name"),true,false);
+    }
+
+    @Bean
+    public Queue mailQueue(){
+        return new Queue(environment.getProperty("rabbitmq.mail.queue.name"),true);
+    }
+
+    @Bean
+    public Binding mailBinding(){
+        return BindingBuilder.bind(mailQueue())
+                .to(mailExchange())
+                .with(environment.getProperty("rabbitmq.mail.routingKey.name"));
     }
 }
