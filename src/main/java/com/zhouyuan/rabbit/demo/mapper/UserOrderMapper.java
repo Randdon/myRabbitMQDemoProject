@@ -1,6 +1,7 @@
 package com.zhouyuan.rabbit.demo.mapper;
 
 import com.zhouyuan.rabbit.demo.entity.UserOrder;
+import org.apache.ibatis.annotations.Param;
 
 public interface UserOrderMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +15,7 @@ public interface UserOrderMapper {
     int updateByPrimaryKeySelective(UserOrder record);
 
     int updateByPrimaryKey(UserOrder record);
+
+    UserOrder selectByPrimaryKeyAndStatus(@Param("id") Integer id, @Param("status") Integer status);
+
 }

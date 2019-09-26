@@ -360,7 +360,7 @@ public class RabbitMqConfig {
         Map<String,Object> args = new HashMap<>(3);
         args.put("x-dead-letter-exchange",environment.getProperty("rabbitmq.user.order.dead.letter.exchange.name"));
         args.put("x-dead-letter-routing-key",environment.getProperty("rabbitmq.user.order.dead.letter.routingKey.name"));
-        args.put("x-message-ttl",10000);
+        args.put("x-message-ttl",15000);
         return new Queue(environment.getProperty("rabbitmq.user.order.dead.letter.queue.name"),
                 true,false,false,args);
     }
@@ -405,7 +405,7 @@ public class RabbitMqConfig {
      * 并发配置-消息确认机制-Listener
      * @return
      */
-    @Bean
+/*    @Bean
     public SimpleMessageListenerContainer usrOdrDeadLetterManualAckContainer(@Qualifier("userOrderDeadLetterQueue") Queue userOrderDeadLetterQueue){
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
 
@@ -413,19 +413,19 @@ public class RabbitMqConfig {
         //视频中用的是container.setMessageConverter(new Jackson2JsonMessageConverter());但这个方法已不被推荐使用了
         container.setMessagePropertiesConverter(new DefaultMessagePropertiesConverter());
 
-        /**
+        *//**
          * 并发配置
-         */
+         *//*
         container.setConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.concurrency",Integer.class));
         container.setMaxConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.max-concurrency",Integer.class));
         container.setPrefetchCount(environment.getProperty("spring.rabbitmq.listener.simple.prefetch",Integer.class));
 
-        /**
+        *//**
          * 消息确认机制配置
-         */
+         *//*
         container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setQueues(userOrderDeadLetterQueue);
         container.setMessageListener(usrOrderDeadLetterManualAckListener);
         return container;
-    }
+    }*/
 }
