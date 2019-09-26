@@ -33,4 +33,30 @@ public class DeadLetterListener {
             log.error("监听死信队列中的过期消息出现异常：{}",e);
         }
     }
+
+    /**
+     * 用户下单消息死信队列的支付超时过期消息队列的监听器
+     * @param id
+     */
+    @RabbitListener(queues = "${rabbitmq.user.order.dead.letter.expired.queue.name}",containerFactory = "multiLisenerContainer")
+    public void listenToUserOrderExpiredQueue(@Payload Integer id){
+        log.info("用户下单消息死信队列的支付超时过期消息队列的监听器监听到消息：{}",id);
+    }
+
+
+    /**
+     * 用户下单消息死信队列监听器
+     * 只要监听了，就不会进过期队列，从而引发一个问题，即如果我支付没超时，那么怎么防止这个消息进到过期消息队列里去
+     * 支付没超时的业务逻辑是怎么样的？？？？？？？？？？？？？？？
+     */
+/*    @RabbitListener(queues = "${rabbitmq.user.order.dead.letter.queue.name}",containerFactory = "multiLisenerContainer")
+    public void listenToUserOrderDeadLetterQueue(@Payload Integer id){
+        try {
+            log.info("用户下单死信队列监听器监听到消息：{}",id);
+            Thread.sleep(20000);
+            log.info("用户下单死信队列监听器线程休眠2秒后执行此语句！");
+        } catch (InterruptedException e) {
+            log.error("用户下单死信队列监听器监听到消息：{}",e);
+        }
+    }*/
 }

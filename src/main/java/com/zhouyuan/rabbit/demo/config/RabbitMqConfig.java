@@ -2,6 +2,7 @@ package com.zhouyuan.rabbit.demo.config;
 
 import com.zhouyuan.rabbit.demo.rabbitlistener.SimpleListener;
 import com.zhouyuan.rabbit.demo.rabbitlistener.UserOrderListener;
+import com.zhouyuan.rabbit.demo.rabbitlistener.UsrOrderDeadLetterManualAckListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -347,5 +348,84 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(deadLetterExpiredMsgQueue())
                 .to(deadLetterExchange())
                 .with(environment.getProperty("rabbitmq.dead.letter.routingKey.name"));
+    }
+
+
+    /**
+     * 用户下单支付超时死信队列消息模型
+     */
+
+    @Bean
+    public Queue userOrderDeadLetterQueue(){
+        Map<String,Object> args = new HashMap<>(3);
+        args.put("x-dead-letter-exchange",environment.getProperty("rabbitmq.user.order.dead.letter.exchange.name"));
+        args.put("x-dead-letter-routing-key",environment.getProperty("rabbitmq.user.order.dead.letter.routingKey.name"));
+        args.put("x-message-ttl",10000);
+        return new Queue(environment.getProperty("rabbitmq.user.order.dead.letter.queue.name"),
+                true,false,false,args);
+    }
+
+    @Bean
+    public TopicExchange userOrderDeadLetterSourceExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.user.order.dead.letter.source.exchange.name"),
+                true,false);
+    }
+
+    @Bean
+    public Binding userOrderDeadLetterSourceBinding(){
+        return BindingBuilder.bind(userOrderDeadLetterQueue())
+                .to(userOrderDeadLetterSourceExchange())
+                .with(environment.getProperty("rabbitmq.user.order.dead.letter.source.routingKey.name"));
+    }
+
+    @Bean
+    public Queue userOrderDeadLetterExpiredQueue(){
+        return new Queue(environment.getProperty("rabbitmq.user.order.dead.letter.expired.queue.name"),true);
+    }
+
+    @Bean
+    public TopicExchange userOrderDeadLetterExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.user.order.dead.letter.exchange.name"),true,false);
+    }
+
+    @Bean
+    public Binding userOrderDeadLetterBinding(){
+        return BindingBuilder.bind(userOrderDeadLetterExpiredQueue())
+                .to(userOrderDeadLetterExchange())
+                .with(environment.getProperty("rabbitmq.user.order.dead.letter.routingKey.name"));
+    }
+
+
+
+
+
+    @Autowired
+    UsrOrderDeadLetterManualAckListener usrOrderDeadLetterManualAckListener;
+    /**
+     * 并发配置-消息确认机制-Listener
+     * @return
+     */
+    @Bean
+    public SimpleMessageListenerContainer usrOdrDeadLetterManualAckContainer(@Qualifier("userOrderDeadLetterQueue") Queue userOrderDeadLetterQueue){
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+
+        container.setConnectionFactory(connectionFactory);
+        //视频中用的是container.setMessageConverter(new Jackson2JsonMessageConverter());但这个方法已不被推荐使用了
+        container.setMessagePropertiesConverter(new DefaultMessagePropertiesConverter());
+
+        /**
+         * 并发配置
+         */
+        container.setConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.concurrency",Integer.class));
+        container.setMaxConcurrentConsumers(environment.getProperty("spring.rabbitmq.listener.simple.max-concurrency",Integer.class));
+        container.setPrefetchCount(environment.getProperty("spring.rabbitmq.listener.simple.prefetch",Integer.class));
+
+        /**
+         * 消息确认机制配置
+         */
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        container.setQueues(userOrderDeadLetterQueue);
+        container.setMessageListener(usrOrderDeadLetterManualAckListener);
+        return container;
     }
 }
