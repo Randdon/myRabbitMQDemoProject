@@ -298,6 +298,9 @@ public class RabbitMqConfig {
      */
 
     @Bean
+    /**
+     * 死信队列
+     */
     public Queue deadLetterQueue(){
         Map<String,Object> args = new HashMap<>(3);
         args.put("x-dead-letter-exchange",environment.getProperty("rabbitmq.dead.letter.exchange.name"));
@@ -307,15 +310,42 @@ public class RabbitMqConfig {
         return new Queue(environment.getProperty("rabbitmq.dead.letter.queue.name"),true,false,false,args);
     }
 
+    /**
+     * 将死信队列和消息的发送端的交换机绑定
+     * @return
+     */
     @Bean
-    public TopicExchange deadLetterExchange(){
+    public TopicExchange deadLetterMsgSourceExchange(){
         return new TopicExchange(environment.getProperty("rabbitmq.dead.letter.source.exchange.name"),true,false);
     }
 
     @Bean
-    public Binding deadLetterBinding(){
+    public Binding deadLetterMsgSourceBinding(){
         return BindingBuilder.bind(deadLetterQueue())
-                .to(deadLetterExchange())
+                .to(deadLetterMsgSourceExchange())
                 .with(environment.getProperty("rabbitmq.dead.letter.source.routingKey.name"));
+    }
+
+    @Bean
+    /**
+     * 如果发往私信队列的消息未在有效时间内被消费，则该消息就会被发往下面这个队列中，即该队列专门用来存储过期消息
+     */
+    public Queue deadLetterExpiredMsgQueue(){
+        return new Queue(environment.getProperty("rabbitmq.dead.letter.expired.queue.name"),true);
+    }
+
+    /**
+     * 将过期消息队列和死信队列内部的死信交换机绑定，这样便可在消息过期后由死信交换机将过期消息路由给过期消息队列
+     * @return
+     */
+    @Bean
+    public TopicExchange deadLetterExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.dead.letter.exchange.name"),true,false);
+    }
+
+    @Bean public Binding deadLetterBind(){
+        return BindingBuilder.bind(deadLetterExpiredMsgQueue())
+                .to(deadLetterExchange())
+                .with(environment.getProperty("rabbitmq.dead.letter.routingKey.name"));
     }
 }
