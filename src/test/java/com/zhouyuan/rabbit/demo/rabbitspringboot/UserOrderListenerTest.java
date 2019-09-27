@@ -121,4 +121,41 @@ public class UserOrderListenerTest extends DemoApplicationTests {
         });
 
     }
+
+    /**
+     * 用户下单支付超时死信队列测试-动态配置TTL
+     */
+    @Test
+    public void userOrderDeadLetterDynamicTTLTest(){
+        UserOrderDto dto = new UserOrderDto();
+        dto.setOrderNo("10010");
+        dto.setUserId(1);
+        UserOrder userOrder = new UserOrder();
+        BeanUtils.copyProperties(dto,userOrder);
+        userOrder.setStatus(1);
+        userOrderMapper.insertSelective(userOrder);
+
+        Integer id = userOrder.getId();
+
+        rabbitTemplate.setExchange(env.getProperty("rabbitmq.user.order.dynamic.dead.letter.source.exchange.name"));
+        rabbitTemplate.setRoutingKey(env.getProperty("rabbitmq.user.order.dynamic.dead.letter.source.routingKey.name"));
+        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+
+        rabbitTemplate.convertAndSend(id, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                MessageProperties properties = message.getMessageProperties();
+                properties.setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                properties.setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME,Integer.class);
+                /**
+                 * 在发送消息的时候动态配置TTL过期时间
+                 * 这里的参数ttl也可以设置成随机数，体现动态特性
+                 */
+                long ttl = 10000L;
+                properties.setExpiration(String.valueOf(ttl));
+                return message;
+            }
+        });
+
+    }
 }

@@ -428,4 +428,52 @@ public class RabbitMqConfig {
         container.setMessageListener(usrOrderDeadLetterManualAckListener);
         return container;
     }*/
+
+    /**
+     * 用户下单支付超时死信队列消息模型——动态配置ttl
+     */
+
+    @Bean
+    public Queue usrOdrDeadLetterDynamicTTLQueue(){
+        Map<String,Object> args = new HashMap<>(2);
+        args.put("x-dead-letter-exchange",environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.exchange.name"));
+        args.put("x-dead-letter-routing-key",environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.routingKey.name"));
+        /**
+         * 相比于非动态配置的死信队列，这里不用设置超时时间，改在发送消息的时候设置
+         */
+        return new Queue(environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.queue.name"),
+                true,false,false,args);
+    }
+
+    @Bean
+    public TopicExchange usrOdrDeadLetterDynamicTTLSourceExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.source.exchange.name"),
+                true,false);
+    }
+
+    @Bean
+    public Binding usrOdrDeadLetterDynamicTTLSourceBinding(){
+        return BindingBuilder.bind(usrOdrDeadLetterDynamicTTLQueue())
+                .to(usrOdrDeadLetterDynamicTTLSourceExchange())
+                .with(environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.source.routingKey.name"));
+    }
+
+    @Bean
+    public Queue usrOdrDeadLetterDynamicExpiredQueue(){
+        return new Queue(environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.expired.queue.name"),true);
+    }
+
+    @Bean
+    public TopicExchange usrOdrDeadLetterDynamicExchange(){
+        return new TopicExchange(environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.exchange.name"),
+                true,false);
+    }
+
+    @Bean
+    public Binding usrOdrDeadLetterDynamicBinding(){
+        return BindingBuilder.bind(usrOdrDeadLetterDynamicExpiredQueue())
+                .to(usrOdrDeadLetterDynamicExchange())
+                .with(environment.getProperty("rabbitmq.user.order.dynamic.dead.letter.routingKey.name"));
+    }
+
 }

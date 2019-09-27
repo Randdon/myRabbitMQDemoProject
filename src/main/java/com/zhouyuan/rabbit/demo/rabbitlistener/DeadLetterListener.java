@@ -44,7 +44,7 @@ public class DeadLetterListener {
      * 用户下单消息死信队列的支付超时过期消息队列的监听器
      * @param id
      */
-    @RabbitListener(queues = "${rabbitmq.user.order.dead.letter.expired.queue.name}",containerFactory = "multiLisenerContainer")
+    @RabbitListener(queues = "${rabbitmq.user.order.dynamic.dead.letter.expired.queue.name}",containerFactory = "multiLisenerContainer")
     public void listenToUserOrderExpiredQueue(@Payload Integer id){
 
         log.info("用户下单消息死信队列的支付超时过期消息队列的监听器监听到消息：{}",id);
@@ -60,6 +60,24 @@ public class DeadLetterListener {
          * 如果支付成功不在这里做处理，有单独的支付接口处理支付业务，那么支付成功的消息到了这个消费者的时候不会对这个消息做处理，
          * 但是在开启自动确认的情况下，消息到了消费者就是被确认消费了，会在队列中删除掉，不会有垃圾消息堆积的情况
          */
+    }
+
+    /**
+     * 用户下单消息死信队列的支付超时过期消息队列的监听器-动态配置TTL
+     * @param id
+     */
+    @RabbitListener(queues = "${rabbitmq.user.order.dead.letter.expired.queue.name}",containerFactory = "multiLisenerContainer")
+    public void listenToUserOrderDynamicTTLExpiredQueue(@Payload Integer id){
+
+        log.info("用户下单消息死信队列的支付超时过期消息队列的监听器监听到消息：{}",id);
+
+        UserOrder userOrder = userOrderMapper.selectByPrimaryKeyAndStatus(id,1);
+        if (null != userOrder){
+            //超时未支付，设置状态为取消订单
+            userOrder.setStatus(3);
+            userOrder.setUpdateTime(new Date());
+            userOrderMapper.updateByPrimaryKey(userOrder);
+        }
     }
 
 
